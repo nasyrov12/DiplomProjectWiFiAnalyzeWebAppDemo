@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список точек доступа WiFi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .bssid-table {
+            margin-bottom: 0;
+        }
+        .bssid-table td {
+            border: none;
+            padding: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mb-3">Список точек доступа WiFi</h2>
+    <form action="/access_points/scan" method="post">
+        <button type="submit" class="btn btn-success">Сканировать сети</button>
+    </form>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Название (SSID)</th>
+            <th>BSSID</th>
+            <th>Уровень сигнала (%)</th>
+            <th>Частота</th>
+            <th>Канал</th>
+            <th>Стандарт</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="accessPoint : ${accessPoints}">
+            <td th:text="${accessPoint.name}">Неизвестно</td>
+            <td colspan="5">
+                <table class="bssid-table">
+                    <tr th:each="bssid : ${accessPoint.bssids}">
+                        <td th:text="${bssid.mac}">—</td>
+                        <td th:text="${bssid.signal} + '%'">—</td>
+                        <td th:text="${bssid.frequency != null ? bssid.frequency : '—'}">—</td>
+                        <td th:text="${bssid.channel}">—</td>
+                        <td th:text="${bssid.radioType != null ? bssid.radioType : '—'}">—</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
