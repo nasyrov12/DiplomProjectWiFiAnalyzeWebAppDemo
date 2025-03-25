@@ -28,6 +28,7 @@ private final AccessPointService accessPointService;
         accessPointService.scanAndUpdateAccessPoints();
         model.addAttribute("accessPoints", accessPointService.getAccessPoints());
         System.out.println("Отдаем в представление"+ accessPointService.getAccessPoints());
+
         return "index"; // Возвращаем шаблон index.html
     }
 

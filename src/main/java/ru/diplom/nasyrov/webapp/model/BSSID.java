@@ -55,4 +55,7 @@ public class BSSID {
     public void setFrequency(String frequency) {
         this.frequency = frequency;
     }
+
+    public BSSID() {
+    }
 }

@@ -10,13 +10,26 @@
         }
         .table {
             margin-top: 20px;
+            table-layout: fixed;
+            width: 100%;
+        }
+        .table th, .table td {
+            padding: 8px;
+            vertical-align: middle;
         }
         .bssid-table {
-            margin-bottom: 0;
+            width: 100%;
+            margin: 0;
+        }
+        .bssid-table tr:not(:last-child) {
+            border-bottom: 1px solid #dee2e6;
         }
         .bssid-table td {
+            padding: 8px;
             border: none;
-            padding: 0.25rem;
+        }
+        .ssid-cell {
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -30,25 +43,25 @@
     <table class="table table-bordered">
         <thead class="table-dark">
         <tr>
-            <th>Название (SSID)</th>
-            <th>BSSID</th>
-            <th>Уровень сигнала (%)</th>
-            <th>Частота</th>
-            <th>Канал</th>
-            <th>Стандарт</th>
+            <th style="width: 15%">Название (SSID)</th>
+            <th style="width: 20%">BSSID</th>
+            <th style="width: 15%">Уровень сигнала (%)</th>
+            <th style="width: 15%">Частота</th>
+            <th style="width: 10%">Канал</th>
+            <th style="width: 15%">Стандарт</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="accessPoint : ${accessPoints}">
-            <td th:text="${accessPoint.name}">Неизвестно</td>
-            <td colspan="5">
+            <td class="ssid-cell" th:text="${accessPoint.name} ?: '<Без имени>'">Неизвестно</td>
+            <td colspan="5" style="padding: 0">
                 <table class="bssid-table">
                     <tr th:each="bssid : ${accessPoint.bssids}">
-                        <td th:text="${bssid.mac}">—</td>
-                        <td th:text="${bssid.signal} + '%'">—</td>
-                        <td th:text="${bssid.frequency != null ? bssid.frequency : '—'}">—</td>
-                        <td th:text="${bssid.channel}">—</td>
-                        <td th:text="${bssid.radioType != null ? bssid.radioType : '—'}">—</td>
+                        <td style="width: 20%" th:text="${bssid.mac}">—</td>
+                        <td style="width: 15%" th:text="${bssid.signal} + '%'">—</td>
+                        <td style="width: 15%" th:text="${bssid.frequency} ?: '—'">—</td>
+                        <td style="width: 10%" th:text="${bssid.channel} ?: '—'">—</td>
+                        <td style="width: 15%" th:text="${bssid.radioType} ?: '—'">—</td>
                     </tr>
                 </table>
             </td>

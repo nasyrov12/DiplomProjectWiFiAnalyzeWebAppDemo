@@ -102,6 +102,7 @@ public class testrsb {
                             System.out.println("     Signal: " + bssid.getSignal() + "%");
                             System.out.println("     Channel: " + bssid.getChannel());
                             System.out.println("     Radio Type: " + bssid.getRadioType());
+                            System.out.println();
                         }
                         System.out.println("-----------------------------");
                     }

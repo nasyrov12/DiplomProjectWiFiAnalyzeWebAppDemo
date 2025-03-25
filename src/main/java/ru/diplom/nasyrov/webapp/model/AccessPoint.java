@@ -8,7 +8,7 @@ import java.util.List;
 
 public class AccessPoint {
     private String name; // SSID (имя точки доступа)
-    private List<BSSID> bssids; // Список BSSID, связанных с этой точкой доступа
+    private  List<BSSID> bssids; // Список BSSID, связанных с этой точкой доступа
 
     public AccessPoint() {
         this.bssids = new ArrayList<>();
