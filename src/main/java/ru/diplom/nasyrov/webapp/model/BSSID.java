@@ -1,6 +1,6 @@
 package ru.diplom.nasyrov.webapp.model;
 
-public class BSSID {
+public class BSSID  {
     private String mac; // MAC-адрес радиоинтерфейса
     private int signal; // Уровень сигнала (в % или dBm)
     private String radioType; // Тип радио (например, 802.11ac)
@@ -58,4 +58,9 @@ public class BSSID {
 
     public BSSID() {
     }
+
+//    @Override
+//    public int compareTo(BSSID o) {
+//        if (this.g)
+//    }
 }

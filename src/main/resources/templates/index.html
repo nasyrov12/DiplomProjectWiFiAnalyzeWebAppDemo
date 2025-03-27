@@ -2,72 +2,191 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Список точек доступа WiFi</title>
+    <title>WiFi Networks Analysis</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
         body {
             padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .frequency-section {
+            margin-bottom: 30px;
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .frequency-title {
+            color: #0d6efd;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #0d6efd;
         }
         .table {
-            margin-top: 20px;
-            table-layout: fixed;
-            width: 100%;
+            margin-bottom: 0;
         }
-        .table th, .table td {
-            padding: 8px;
-            vertical-align: middle;
+        .table th {
+            background-color: #f1f1f1;
         }
-        .bssid-table {
-            width: 100%;
-            margin: 0;
-        }
-        .bssid-table tr:not(:last-child) {
+        .bssid-row {
             border-bottom: 1px solid #dee2e6;
         }
-        .bssid-table td {
-            padding: 8px;
-            border: none;
+        .bssid-row:last-child {
+            border-bottom: none;
         }
-        .ssid-cell {
-            white-space: nowrap;
+        .signal-cell {
+            font-weight: bold;
+        }
+        .signal-excellent { color: #28a745; }
+        .signal-good { color: #5cb85c; }
+        .signal-fair { color: #ffc107; }
+        .signal-weak { color: #fd7e14; }
+        .signal-poor { color: #dc3545; }
+        .no-networks {
+            color: #6c757d;
+            font-style: italic;
+            padding: 15px;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2 class="mb-3">Список точек доступа WiFi</h2>
-    <form action="/access_points/scan" method="post">
-        <button type="submit" class="btn btn-success">Сканировать сети</button>
+    <h2 class="mb-4">WiFi Networks Analysis</h2>
+
+    <form th:action="@{/access_points/scan}" method="post" class="mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat"></i> Scan Networks
+        </button>
     </form>
 
-    <table class="table table-bordered">
-        <thead class="table-dark">
-        <tr>
-            <th style="width: 15%">Название (SSID)</th>
-            <th style="width: 20%">BSSID</th>
-            <th style="width: 15%">Уровень сигнала (%)</th>
-            <th style="width: 15%">Частота</th>
-            <th style="width: 10%">Канал</th>
-            <th style="width: 15%">Стандарт</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="accessPoint : ${accessPoints}">
-            <td class="ssid-cell" th:text="${accessPoint.name} ?: '<Без имени>'">Неизвестно</td>
-            <td colspan="5" style="padding: 0">
-                <table class="bssid-table">
-                    <tr th:each="bssid : ${accessPoint.bssids}">
-                        <td style="width: 20%" th:text="${bssid.mac}">—</td>
-                        <td style="width: 15%" th:text="${bssid.signal} + '%'">—</td>
-                        <td style="width: 15%" th:text="${bssid.frequency} ?: '—'">—</td>
-                        <td style="width: 10%" th:text="${bssid.channel} ?: '—'">—</td>
-                        <td style="width: 15%" th:text="${bssid.radioType} ?: '—'">—</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- 2.4 GHz Networks -->
+    <div class="frequency-section" th:if="${groupedNetworks['2.4 GHz'] != null and not groupedNetworks['2.4 GHz'].empty}">
+        <h3 class="frequency-title">2.4 GHz Networks</h3>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>SSID</th>
+                    <th>BSSID (MAC)</th>
+                    <th>Signal</th>
+                    <th>Channel</th>
+                    <th>Protocol</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ap : ${groupedNetworks['2.4 GHz']}">
+                    <td th:text="${ap.name} ?: '<Без имени>'" class="font-weight-bold"></td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td th:text="${bssid.mac}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td>
+                                        <span th:text="${bssid.signal} + '%'"
+                                              th:class="${'signal-cell ' +
+                                                (bssid.signal > 80 ? 'signal-excellent' :
+                                                 bssid.signal > 60 ? 'signal-good' :
+                                                 bssid.signal > 40 ? 'signal-fair' :
+                                                 bssid.signal > 20 ? 'signal-weak' : 'signal-poor')}">
+                                        </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td th:text="${bssid.channel}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td th:text="${bssid.radioType}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="frequency-section" th:unless="${groupedNetworks['2.4 GHz'] != null and not groupedNetworks['2.4 GHz'].empty}">
+        <h3 class="frequency-title">2.4 GHz Networks</h3>
+        <div class="no-networks">No 2.4 GHz networks found</div>
+    </div>
+
+    <!-- 5 GHz Networks -->
+    <div class="frequency-section" th:if="${groupedNetworks['5 GHz'] != null and not groupedNetworks['5 GHz'].empty}">
+        <h3 class="frequency-title">5 GHz Networks</h3>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>SSID</th>
+                    <th>BSSID (MAC)</th>
+                    <th>Signal</th>
+                    <th>Channel</th>
+                    <th>Protocol</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ap : ${groupedNetworks['5 GHz']}">
+                    <td th:text="${ap.name} ?: '<Без имени>'" class="font-weight-bold"></td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td th:text="${bssid.mac}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td>
+                                        <span th:text="${bssid.signal} + '%'"
+                                              th:class="${'signal-cell ' +
+                                                (bssid.signal > 80 ? 'signal-excellent' :
+                                                 bssid.signal > 60 ? 'signal-good' :
+                                                 bssid.signal > 40 ? 'signal-fair' :
+                                                 bssid.signal > 20 ? 'signal-weak' : 'signal-poor')}">
+                                        </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td th:text="${bssid.channel}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-sm mb-0">
+                            <tr th:each="bssid : ${ap.bssids}" class="bssid-row">
+                                <td th:text="${bssid.radioType}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="frequency-section" th:unless="${groupedNetworks['5 GHz'] != null and not groupedNetworks['5 GHz'].empty}">
+        <h3 class="frequency-title">5 GHz Networks</h3>
+        <div class="no-networks">No 5 GHz networks found</div>
+    </div>
 </div>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </body>
 </html>

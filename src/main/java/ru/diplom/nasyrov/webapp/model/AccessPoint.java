@@ -9,6 +9,7 @@ import java.util.List;
 public class AccessPoint {
     private String name; // SSID (имя точки доступа)
     private  List<BSSID> bssids; // Список BSSID, связанных с этой точкой доступа
+    private boolean isHidden;
 
     public AccessPoint() {
         this.bssids = new ArrayList<>();
@@ -29,5 +30,14 @@ public class AccessPoint {
 
     public List<BSSID> getBssids() {
         return bssids;
+    }
+
+
+
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
+    }
+    public String getDisplayName() {
+        return isHidden ? "" : name;
     }
 }
